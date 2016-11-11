@@ -1,0 +1,15 @@
+---
+:hello: "Hi, my young codebreaker.\n\nIf you want to: \na) Start new game - puts 'NEW'\nb)
+  Load game statistics - puts 'STATS'"
+:ask_name: "Put your codebreaker's login here:"
+:ask_difficulty: "Choose the difficulty:"
+:ask_difficulty_choice: "Your choice:"
+:hint_info: "If you want to take a hint - pass HINT"
+:ask_answer: "Make your choice: "
+:no_hints: "There are no more hints :("
+:hints_left: "No used hints left: "
+:right_digit: "One of the digits in a secret code is: "
+:win: "Congratulations, you win!"
+:right_code: "Right code : "
+:loose: "Sorry, there are no attempts left :( You loose"
+:no_stats: "There are no active statistics now"
