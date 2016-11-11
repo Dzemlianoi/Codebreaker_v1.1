@@ -1,5 +1,5 @@
-require "codebreaker/version"
+require_relative 'codebreaker/game.rb'
+require 'yaml'
 
-module Codebreaker
-  # Your code goes here...
-end
+game = Codebreaker::Game.new
+game.start
