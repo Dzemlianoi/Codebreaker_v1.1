@@ -1,113 +1,78 @@
 module Codebreaker
   class Game
-    attr_accessor :options, :current_code, :result
-    PATH = 'lib/codebreaker/data/'
-    EXTENSION = '.yml'
+    attr_accessor :options, :current_code, :result, :render
+    ALLOWED_SCENARIOS = %w(new exit load)
 
     def initialize
-      @phrases = load('phrases')
-      @difficulties = load('difficulties')
+      @difficulties = Loader.load('difficulties')
       @stats = []
+      self.render = Render.new
       self.options = {}
+      render.hello
     end
 
     def start
-      scenario = ''
-      puts @phrases[:hello]
-      until %w('new stats).include?(scenario)
-        scenario = gets.chomp.downcase
-      end
-
-      send(scenario.to_s)
-    end
-
-    def new
-      ask_name
-      ask_difficulty
-      options[:secret_code] = generate_secret_code
-      answer_operations
+      scenario = gets.chomp.downcase
+      return send(scenario.to_s) if ALLOWED_SCENARIOS.include? scenario
+      start
     end
 
     def stats
-      if first_play?
-        puts @phrases[:no_stats]
-      else
-        stats_load
-        stat_describe
-      end
-      new
+      first_play? ? render.no_stats : render.stat_describe(@stats)
+      start
     end
 
     def first_play?
       !File.exist?("#{PATH}statistics#{EXTENSION}")
     end
 
-    def stats_load
-      @stats = load('statistics')
-    end
-
-    def stat_describe
-      @stats.each do |game|
-        puts "Codebreaker: #{game[:name]}\n
-              Difficulty: #{game[:difficulty]}\n
-              Attempts: #{game[:attempts_left]}/#{game[:attempts]}\n
-              Hints: #{game[:hints_left]}/#{game[:hints]}\n"
-      end
-    end
-
-    def answer_operations
-      puts @phrases[:hint_info]
-      puts @phrases[:ask_answer]
-
-      while options[:attempts_left].positive?
+    def game
+      render.answers_hints_info
+      (0..options[:attempts_left]).each do |val|
         input = gets.chomp.downcase
-        hint?(input) ? show_hint : retrive_answer(input)
+        hint?(input) ? show_hint : handle_answer(input)
         return save_result if win?
       end
-      loose
+      render.loose(options[:secret_code])
     end
 
     def hint?(input)
       input.downcase == 'hint'
     end
 
-    def retrive_answer(input)
+    def handle_answer(input)
       self.current_code = input
       options[:attempts_left] -= 1
-      return puts @phrases[:win] if win?
-      puts comparision_result
+      code_result
     end
 
     private
 
-    def ask_name
-      puts @phrases[:ask_name]
-      while options[:name].nil? || options[:name].empty?
-        options[:name] = gets.chomp
-      end
+    def new
+      confirm_settings
+      options[:secret_code] = generate_secret_code
+      game
     end
 
-    def ask_difficulty
-      show_difficulty_message
+    def confirm_settings
+      render.ask_name
+      options[:name] = gets.chomp
+      render.difficulties_show(@difficulties)
+      options[:difficulty] = gets.chomp.to_sym
 
-      until @difficulties.keys.include? options[:difficulty]
-        options[:difficulty] = gets.chomp.to_sym
-      end
+      return ask_settings unless options_right?
+      asign_options
+    end
 
+    def options_right?
+      return !options[:name].nil? && @difficulties.include?(options[:difficulty])
+    end
+
+    def asign_options
       options[:hints] = @difficulties[options[:difficulty]][:hints]
       options[:hints_left] = options[:hints].to_i
       options[:attempts] = @difficulties[options[:difficulty]][:attempts]
       options[:attempts_left] = options[:attempts].to_i
-    end
-
-    def show_difficulty_message
-      puts @phrases[:ask_difficulty]
-      @difficulties.each do |diff, details|
-        puts " - #{diff}\n
-              Max hints: #{details[:hints]}\n
-              Max attemts: #{details[:attempts]}\n"
-      end
-      puts @phrases[:ask_difficulty_choice]
     end
 
     def generate_secret_code
@@ -115,64 +80,36 @@ module Codebreaker
     end
 
     def show_hint
-      return puts @phrases[:no_hints] if options[:hints_left].zero?
+      return render.no_hints if options[:hints_left].zero?
       options[:hints_left] -= 1
-      puts "#{@phrases[:hints_left]} #{options[:hints_left]}"
-      puts "#{@phrases[:right_digit]} #{options[:secret_code][rand(4)]}"
+      render.hints_left_info(options[:hints_left], options[:secret_code][rand(4)])
     end
 
     def win?
       current_code == options[:secret_code]
     end
 
-    def loose
-      puts @phrases[:loose]
-      puts @phrases[:right_code] << options[:secret_code]
-    end
-
-    def number_of_pluses
-      @pluses = []
-      input_code = current_code.split('')
-      secret_code = options[:secret_code].split('')
-      input_code.each_index do |k|
-        @pluses.push(k) if input_code[k] == secret_code[k]
+    def code_result
+      answer = ''
+      secret_code_copy = options[:secret_code].split('')
+      current_code_copy = current_code.split('')
+      (0...4).each do |k|
+        if options[:secret_code][k] == current_code[k]
+          answer << '+'
+          current_code_copy[k] = nil
+          secret_code_copy[k] = nil
+        end
       end
-      @pluses.size
-    end
-
-    def number_of_minuses
-      input_code = current_code.split('')
-      secret_code = options[:secret_code].split('')
-      @pluses.each do |k|
-        input_code[k] = nil
-        secret_code[k] = nil
-      end
-      @minuses = input_code.compact & secret_code.compact
-      @minuses.size
-    end
-
-    def comparision_result
-      '+' * number_of_pluses << '-' * number_of_minuses
+      minuses = current_code_copy.compact & secret_code_copy.compact
+      minuses.size.times {answer << '-'}
+      puts options[:secret_code]
+      puts answer
     end
 
     def save_result
-      @stats = load('statistics')
+      @stats = Loader.load('statistics')
       @stats.push(options)
-      save('statistics', @stats)
-    end
-
-    def load(file_name)
-      file_name = PATH + file_name + EXTENSION.to_s
-      return YAML.load(File.open(file_name)) if File.exist?(file_name)
-      File.new(file_name, 'w')
-      @stats = []
-    end
-
-    def save(file_name, data_object)
-      full_path = PATH.to_s + file_name.to_s + EXTENSION
-      data = YAML.dump(data_object)
-      File.new(full_path, 'w') unless File.exist?(full_path)
-      File.write(full_path, data)
+      Loader.save('statistics', @stats)
     end
   end
 end
