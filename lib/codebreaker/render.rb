@@ -14,10 +14,10 @@ module Codebreaker
 
     def stat_describe(stats)
       stats.each do |game|
-        puts "Codebreaker: #{game[:name]}\n
-              Difficulty: #{game[:difficulty]}\n
-              Attempts: #{game[:attempts_left]}/#{game[:attempts]}\n
-              Hints: #{game[:hints_left]}/#{game[:hints]}\n"
+        puts "Codebreaker: #{game[:name]}
+        Difficulty: #{game[:difficulty]}
+        Attempts: #{game[:attempts_left]}/#{game[:attempts]}
+        Hints: #{game[:hints_left]}/#{game[:hints]}"
       end
     end
 
@@ -53,6 +53,15 @@ module Codebreaker
     def hints_left_info(hints_left, random_dig)
       puts "#{@phrases[:hints_left]} #{hints_left}"
       puts "#{@phrases[:right_digit]} #{random_dig}"
+    end
+
+    def wrong_input
+      puts @phrases[:wrong_input]
+    end
+
+    def win
+      puts @phrases[:win]
+      puts @phrases[:ask_for_save]
     end
   end
 end
