@@ -5,7 +5,7 @@ module Codebreaker
 
     def initialize
       @difficulties = Loader.load('difficulties')
-      @stats = Loader.load('statistics');
+      @stats = Loader.load('statistics')
       self.render = Render.new
       self.options = {}
       render.hello
@@ -19,7 +19,7 @@ module Codebreaker
 
     def game
       render.answers_hints_info
-      (0..options[:attempts_left]).each do |val|
+      (0..options[:attempts_left]).each do
         input = gets.chomp.downcase
         hint?(input) ? show_hint : handle_answer(input)
         return win if win?
@@ -42,7 +42,7 @@ module Codebreaker
 
     def new
       confirm_settings
-      options[:secret_code]  = generate_secret_code
+      options[:secret_code] = generate_secret_code
       self.hint_code_digits = options[:secret_code].clone
       puts options[:secret_code]
       game
@@ -93,7 +93,7 @@ module Codebreaker
     end
 
     def get_hint_digit
-      hint_code_digits.slice!(rand(self.hint_code_digits.size))
+      hint_code_digits.slice!(rand(hint_code_digits.size))
     end
 
     def code_incorrect?
@@ -116,7 +116,7 @@ module Codebreaker
         end
       end
       minuses = current_code_copy.compact & secret_code_copy.compact
-      minuses.size.times {answer << '-'}
+      minuses.size.times { answer << '-' }
       puts answer
     end
 

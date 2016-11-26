@@ -1,6 +1,5 @@
 module Codebreaker
   class Loader
-
     PATH = 'lib/codebreaker/data/'
     EXTENSION = '.yml'
     def self.load(file_name)
@@ -9,7 +8,6 @@ module Codebreaker
       File.new(file_name, 'w')
       []
     end
-
 
     def self.save(file_name, data_object)
       full_path = PATH.to_s + file_name.to_s + EXTENSION
