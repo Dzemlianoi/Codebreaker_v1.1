@@ -17,27 +17,6 @@ module Codebreaker
       start
     end
 
-    def game
-      render.answers_hints_info
-      (0..options[:attempts_left]).each do
-        input = gets.chomp.downcase
-        hint?(input) ? show_hint : handle_answer(input)
-        return win if win?
-      end
-      render.loose(options[:secret_code])
-    end
-
-    def hint?(input)
-      input.downcase == 'hint'
-    end
-
-    def handle_answer(input)
-      self.current_code = input
-      return render.wrong_input if code_incorrect?
-      options[:attempts_left] -= 1
-      code_result
-    end
-
     private
 
     def new
@@ -50,10 +29,10 @@ module Codebreaker
 
     def confirm_settings
       render.ask_name
-      options[:name] = gets.chomp while name_incorrect?
+      options[:name] = gets.chomp until name_correct?
 
       render.difficulties_show(@difficulties)
-      options[:difficulty] = gets.chomp.to_sym while diff_incorrect?
+      options[:difficulty] = gets.chomp.to_sym until diff_correct?
 
       asign_options
     end
@@ -67,12 +46,12 @@ module Codebreaker
       !@stats.any?
     end
 
-    def name_incorrect?
-      options[:name].nil? || options[:name].to_s.empty?
+    def name_correct?
+      !options[:name].nil? && !options[:name].to_s.empty?
     end
 
-    def diff_incorrect?
-      !@difficulties.include?(options[:difficulty])
+    def diff_correct?
+      @difficulties.include?(options[:difficulty])
     end
 
     def asign_options
@@ -86,18 +65,38 @@ module Codebreaker
       (0...4).map { rand(1..6) }.join
     end
 
+    def game
+      render.answers_hints_info
+      (0..options[:attempts_left]).each do
+        self.current_code = gets.chomp.downcase
+        hint?(input) ? show_hint : handle_answer(input)
+        return win if win?
+      end
+      render.loose(options[:secret_code])
+    end
+
     def show_hint
       return render.no_hints if options[:hints_left].zero?
       options[:hints_left] -= 1
       render.hints_left_info(options[:hints_left], get_hint_digit)
     end
 
+    def hint?
+      current_code.downcase == 'hint'
+    end
+
     def get_hint_digit
       hint_code_digits.slice!(rand(hint_code_digits.size))
     end
 
-    def code_incorrect?
-      current_code.match(/^[0-6]{4}$/).nil?
+    def handle_answer
+      return render.wrong_input unless code_correct?
+      options[:attempts_left] -= 1
+      code_result
+    end
+
+    def code_correct?
+      !current_code.match(/^[0-6]{4}$/).nil?
     end
 
     def win?
