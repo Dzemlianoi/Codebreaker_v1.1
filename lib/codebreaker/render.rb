@@ -33,7 +33,6 @@ module Codebreaker
              Max hints: #{details[:hints]}\n
              Max attemts: #{details[:attempts]}\n"
       end
-
       puts @phrases[:ask_difficulty_choice]
     end
 
