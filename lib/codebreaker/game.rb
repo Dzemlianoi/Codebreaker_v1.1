@@ -13,8 +13,7 @@ module Codebreaker
 
     def start
       scenario = gets.chomp.downcase
-      return send(scenario.to_s) if ALLOWED_SCENARIOS.include? scenario
-      start
+      ALLOWED_SCENARIOS.include? scenario ? send(scenario.to_s) : start
     end
 
     private
@@ -23,16 +22,15 @@ module Codebreaker
       confirm_settings
       options[:secret_code] = generate_secret_code
       self.hint_code_digits = options[:secret_code].clone
-      puts options[:secret_code]
       game
     end
 
     def confirm_settings
       render.ask_name
-      options[:name] = gets.chomp until name_correct?
+      options[:name] = $stdin.gets.chomp until name_correct?
 
       render.difficulties_show(@difficulties)
-      options[:difficulty] = gets.chomp.to_sym until diff_correct?
+      options[:difficulty] = $stdin.gets.chomp.to_sym until diff_correct?
 
       asign_options
     end
@@ -68,8 +66,8 @@ module Codebreaker
     def game
       render.answers_hints_info
       (0..options[:attempts_left]).each do
-        self.current_code = gets.chomp.downcase
-        hint?(input) ? show_hint : handle_answer(input)
+        self.current_code = $stdin.gets.chomp.downcase
+        hint? ? show_hint : handle_answer
         return win if win?
       end
       render.loose(options[:secret_code])
@@ -127,7 +125,7 @@ module Codebreaker
 
     def win
       render.win
-      save_result if gets.chomp.downcase == 'y'
+      save_result if $stdin.gets.chomp.downcase == 'y'
     end
   end
 end

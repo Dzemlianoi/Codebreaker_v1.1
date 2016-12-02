@@ -3,4 +3,3 @@ require_relative 'codebreaker/loader.rb'
 require_relative 'codebreaker/render.rb'
 require 'yaml'
 
-game = Codebreaker::Game.new

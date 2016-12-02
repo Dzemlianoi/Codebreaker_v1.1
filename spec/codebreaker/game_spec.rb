@@ -19,13 +19,11 @@ module Codebreaker
 
     context '#start' do
 
-    end
-
-    context '#call_if_allow' do
-
-      it 'should raise error if method isn\'t allowed'
-
-      it 'should call the method of it\'s allowed'
+      it 'should call "new" method if scenario allowed' do
+        allow(game).to receive(:gets).and_return('new')
+        game.start
+        expect(game).to receive(:new)
+      end
     end
   end
 end
