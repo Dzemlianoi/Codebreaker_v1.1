@@ -20,9 +20,24 @@ module Codebreaker
     context '#start' do
 
       it 'should call "new" method if scenario allowed' do
-        allow(game).to receive(:gets).and_return('new')
-        game.start
+        allow(game).to receive_message_chain(:gets).and_return('new')
+        allow(game).to receive(:new)
         expect(game).to receive(:new)
+        game.start
+      end
+
+      it 'should call "exit" method if scenario allowed' do
+        allow(game).to receive_message_chain(:gets).and_return('exit')
+        allow(game).to receive(:exit)
+        expect(game).to receive(:exit)
+        game.start
+      end
+
+      it 'should call "stats" method if scenario allowed' do
+        allow(game).to receive_message_chain(:gets).and_return('stats')
+        allow(game).to receive(:stats)
+        expect(game).to receive(:stats)
+        game.start
       end
     end
   end

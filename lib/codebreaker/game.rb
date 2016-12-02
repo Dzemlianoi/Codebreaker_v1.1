@@ -13,6 +13,7 @@ module Codebreaker
 
     def start
       scenario = gets.chomp.downcase
+      puts scenario
       ALLOWED_SCENARIOS.include? scenario ? send(scenario.to_s) : start
     end
 
