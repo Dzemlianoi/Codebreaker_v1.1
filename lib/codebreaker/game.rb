@@ -13,7 +13,6 @@ module Codebreaker
 
     def start
       scenario = gets.chomp.downcase
-      puts scenario
       ALLOWED_SCENARIOS.include? scenario ? send(scenario.to_s) : start
     end
 
@@ -28,7 +27,7 @@ module Codebreaker
 
     def confirm_settings
       render.ask_name
-      options[:name] = $stdin.gets.chomp until name_correct?
+      options[:name] = gets.chomp until name_correct?
 
       render.difficulties_show(@difficulties)
       options[:difficulty] = $stdin.gets.chomp.to_sym until diff_correct?
@@ -42,7 +41,7 @@ module Codebreaker
     end
 
     def first_play?
-      !@stats.any?
+      @stats.none?
     end
 
     def name_correct?
