@@ -1,6 +1,7 @@
 module Codebreaker
   class Game
     attr_accessor :options, :current_code, :result, :render, :hint_code_digits
+    attr_reader :stats
     ALLOWED_SCENARIOS = %w(new exit stats)
 
     def initialize
@@ -13,7 +14,8 @@ module Codebreaker
 
     def start
       scenario = gets.chomp.downcase
-      ALLOWED_SCENARIOS.include? scenario ? send(scenario.to_s) : start
+      return send(scenario.to_s) if ALLOWED_SCENARIOS.include? scenario
+      start
     end
 
     private
@@ -30,7 +32,7 @@ module Codebreaker
       options[:name] = gets.chomp until name_correct?
 
       render.difficulties_show(@difficulties)
-      options[:difficulty] = $stdin.gets.chomp.to_sym until diff_correct?
+      options[:difficulty] = gets.chomp.to_sym until diff_correct?
 
       asign_options
     end
@@ -41,11 +43,11 @@ module Codebreaker
     end
 
     def first_play?
-      @stats.none?
+      stats.none?
     end
 
     def name_correct?
-      !options[:name].nil? && !options[:name].to_s.empty?
+      !options[:name].to_s.empty?
     end
 
     def diff_correct?
@@ -66,7 +68,7 @@ module Codebreaker
     def game
       render.answers_hints_info
       (0..options[:attempts_left]).each do
-        self.current_code = $stdin.gets.chomp.downcase
+        self.current_code = gets.chomp.downcase
         hint? ? show_hint : handle_answer
         return win if win?
       end
@@ -94,7 +96,7 @@ module Codebreaker
     end
 
     def code_correct?
-      !current_code.match(/^[0-6]{4}$/).nil?
+      current_code.match(/^[0-6]{4}$/)
     end
 
     def win?
@@ -114,18 +116,18 @@ module Codebreaker
       end
       minuses = current_code_copy.compact & secret_code_copy.compact
       minuses.size.times { answer << '-' }
-      puts answer
+      render.answer(answer)
     end
 
     def save_result
-      @stats = Loader.load('statistics') if @stats.any?
+      @stats = Loader.load('statistics') if @stats.none?
       @stats.push(options)
       Loader.save('statistics', @stats)
     end
 
     def win
       render.win
-      save_result if $stdin.gets.chomp.downcase == 'y'
+      save_result if gets.chomp.downcase == 'y'
     end
   end
 end

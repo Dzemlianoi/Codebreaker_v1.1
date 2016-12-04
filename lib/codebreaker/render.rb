@@ -58,6 +58,10 @@ module Codebreaker
       puts @phrases[:wrong_input]
     end
 
+    def answer(result)
+      puts result
+    end
+
     def win
       puts @phrases[:win]
       puts @phrases[:ask_for_save]
