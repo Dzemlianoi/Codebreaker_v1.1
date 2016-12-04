@@ -47,7 +47,7 @@ module Codebreaker
     end
 
     def name_correct?
-      options[:name].to_s.present?
+      !options[:name].to_s.empty?
     end
 
     def diff_correct?
@@ -92,7 +92,7 @@ module Codebreaker
     def handle_answer
       return render.wrong_input unless code_correct?
       options[:attempts_left] -= 1
-      code_result
+      render.answer(code_result)
     end
 
     def code_correct?
@@ -116,7 +116,7 @@ module Codebreaker
       end
       minuses = current_code_copy.compact & secret_code_copy.compact
       minuses.size.times { answer << '-' }
-      render.answer(answer)
+      answer
     end
 
     def save_result

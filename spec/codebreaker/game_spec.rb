@@ -120,15 +120,14 @@ module Codebreaker
       it 'should decrease by 1hints_left' do
         allow(game).to receive(:get_hint_digit)
         game.options[:hints_left] = 5
-        game.send(:show_hint)
-        expect(game.options[:hints_left]).to eql(4)
+        expect{game.send(:show_hint)}.to change{game.options[:hints_left]}
       end
 
       it 'should not decrease hints_left if no more hints left' do
         allow(game).to receive(:get_hint_digit)
         game.options[:hints_left] = 0
-        game.send(:show_hint)
-        expect(game.options[:hints_left]).to eql(0)
+        expect{game.send(:show_hint)}.not_to change{game.options[:hints_left]}
+
       end
     end
 
@@ -156,7 +155,7 @@ module Codebreaker
         allow(game).to receive(:code_correct?){true}
         allow(game).to receive(:code_result)
         game.options[:attempts_left] = 5
-        expect{game.send(:handle_answer)}.to change(game.options[:attempts_left])
+        expect{game.send(:handle_answer)}.to change{game.options[:attempts_left]}
       end
     end
 
@@ -191,31 +190,31 @@ module Codebreaker
       end
     end
 
-  end
-  context '#code_result' do
-    [
-        ['6541', '6541', '++++'],
-        ['1234', '5612', '++--'],
-        ['5566', '5600', '+-'],
-        ['6235', '2365', '+---'],
-        ['1234', '4321', '----'],
-        ['1234', '1235', '+++'],
-        ['1234', '6254', '++'],
-        ['1234', '5635', '+'],
-        ['1234', '4326', '---'],
-        ['1234', '3525', '--'],
-        ['1234', '2552', '-'],
-        ['1234', '4255', '+-'],
-        ['1234', '1524', '++-'],
-        ['1234', '5431', '+--'],
-        ['1234', '6666', ''],
-        ['1115', '1231', '+-'],
-        ['1231', '1111', '++']
-    ].each do |i|
-      it "should return #{i[2]} if code is - #{i[0]}, atttempt_code is #{i[1]}" do
-        game.options[:secret_code] = i[0]
-        game.current_code = i[1]
-        expect(game.send(code_result)).to eq(i[2])
+    context '#code_result' do
+      [
+          ['6541', '6541', '++++'],
+          ['1234', '5612', '--'],
+          ['5566', '5600', '+-'],
+          ['6235', '2365', '+---'],
+          ['1234', '4321', '----'],
+          ['1234', '1235', '+++'],
+          ['1234', '6254', '++'],
+          ['1234', '5635', '+'],
+          ['1234', '4326', '---'],
+          ['1234', '3525', '--'],
+          ['1234', '2552', '-'],
+          ['1234', '4255', '+-'],
+          ['1234', '1524', '++-'],
+          ['1234', '5431', '+--'],
+          ['1234', '6666', ''],
+          ['1115', '1231', '+-'],
+          ['1231', '1111', '++']
+      ].each do |i|
+        it "should return #{i[2]} if code is - #{i[0]}, atttempt_code is #{i[1]}" do
+          game.options[:secret_code] = i[0]
+          game.current_code = i[1]
+          expect(game.send(:code_result)).to eq(i[2])
+        end
       end
     end
   end
