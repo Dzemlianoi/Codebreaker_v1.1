@@ -47,7 +47,7 @@ module Codebreaker
     end
 
     def name_correct?
-      !options[:name].to_s.empty?
+      options[:name].to_s.present?
     end
 
     def diff_correct?

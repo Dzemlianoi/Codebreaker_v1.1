@@ -149,12 +149,6 @@ module Codebreaker
         game.hint_code_digits = '1234'
         expect{game.send(:get_hint_digit)}.to change{game.hint_code_digits}
       end
-
-      it 'should return right digit' do
-        game.hint_code_digits = '1234'
-        allow(Kernel).to receive(:rand){3}
-        expect(game.send(:get_hint_digit)).to eql('4')
-      end
     end
 
     context '#handle_answer' do
@@ -162,8 +156,7 @@ module Codebreaker
         allow(game).to receive(:code_correct?){true}
         allow(game).to receive(:code_result)
         game.options[:attempts_left] = 5
-        game.send(:handle_answer)
-        expect(game.options[:attempts_left]).to eql(4)
+        expect{game.send(:handle_answer)}.to change(game.options[:attempts_left])
       end
     end
 
