@@ -2,7 +2,7 @@
 :hello: "Hi, my young codebreaker.\n\nIf you want to: \na) Start new game - puts 'NEW'\n
 b) Load game statistics - puts 'STATS'\n
 c) Exit from game - puts 'EXIT'"
-:ask_for_save: "If you want to save result press Y/y"
+:ask_for_save: "If you want to save result press y/n"
 :ask_name: "Put your codebreaker's login here:"
 :ask_difficulty: "Choose the difficulty:"
 :ask_difficulty_choice: "Your choice:"
